@@ -12,7 +12,7 @@ Megan Nguyen <br>
 Jacob Leon <br> 
 Riya Yadav 
 <br>________________________________________________________________________________________________________<br>
-<br>________________________________________________________________________________________________________<br> 
+____________________________________________________________________________________________________________<br> 
 <h3>Technical Specification</h3>
 <b>Hardware:</b> LEGO Education MINDSTORMS EV3 (45544 kit). All components must come from this kit. <br> 
 <b>Software:</b> MATLAB is used for programming the vehicle's logic, control systems, and autonomous functions. <br> 
