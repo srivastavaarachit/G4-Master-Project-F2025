@@ -5,12 +5,13 @@ Professor Michael C. Clough,
 Fall 2025<br>
 Arizona State University
 <br>
+<br>________________________________________________________________________________________________________<br>
 Team Members: <br> 
 Rachit Srivastava <br>
 Megan Nguyen <br>
 Jacob Leon <br> 
 Riya Yadav 
-
+<br>________________________________________________________________________________________________________<br>
 <br>________________________________________________________________________________________________________<br> 
 <h3>Technical Specification</h3>
 <b>Hardware:</b> LEGO Education MINDSTORMS EV3 (45544 kit). All components must come from this kit. <br> 
