@@ -1,7 +1,7 @@
 # G4-Master-Project-F2025
-Group 4 
-FSE 100 
-Professor Michael C. Clough
+Group 4 <br>
+FSE 100 <br>
+Professor Michael C. Clough, 
 Fall 2025 
 <br>
 Team Members: <br> 
