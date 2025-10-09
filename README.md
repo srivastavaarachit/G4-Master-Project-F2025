@@ -2,4 +2,10 @@
 Group 4 
 FSE 100 
 Professor Michael C. Clough
-Fall 2025
+Fall 2025 
+<br>
+Team Members: <br> 
+Rachit Srivastava <br>
+Megan Nguyen <br>
+Jacob Leon <br> 
+Riya Yadav <br>
