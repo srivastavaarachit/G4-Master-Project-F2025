@@ -17,3 +17,5 @@ ________________________________________________________________________________
 <b>Hardware:</b> LEGO Education MINDSTORMS EV3 (45544 kit). All components must come from this kit. <br> 
 <b>Software:</b> MATLAB is used for programming the vehicle's logic, control systems, and autonomous functions. <br> 
 ____________________________________________________________________________________________________________<br>
+
+[![Remote Control Car Demo](https://img.youtube.com/vi/https://www.youtube.com/watch?v=cHd32MXee_0/0.jpg)](https://www.youtube.com/watch?v=cHd32MXee_0)
