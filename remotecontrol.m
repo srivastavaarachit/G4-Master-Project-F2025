@@ -1,25 +1,44 @@
-% MATLAB Documentation reference
-% Initialize the keyboard input
-% Displays the Action only as //output
+% full remote control with arm control 
+% for # milestone 01
 
 global key;
 InitKeyboard();
-while 1
+
+while 1                             
     pause(0.1);
     switch key
-        case 'uparrow'
-            disp('Up Arrow Pressed!'); % it will only display not move
-        case 'downarrow'
-            disp('Down Arrow Pressed!');
-        case 'leftarrow'
-            disp('Left Arrow Pressed!'); %change display statements to motor control
-        case 'rightarrow'
-            disp('Right Arrow Pressed!');
-        case 0
-            disp('No Key Pressed');
-        case 'q'
+        case 'w'                                % forward movement
+            brick.MoveMotor('BC', 50);  
+            
+        case 's'                                % backward movement
+            brick.MoveMotor('BC', -50);  
+            
+        case 'a'                                % left side movement
+            brick.MoveMotor('B', 20);   
+            brick.MoveMotor('C', 50);
+            
+        case 'd'                                % right side movement
+            brick.MoveMotor('B', 50);   
+            brick.MoveMotor('C', 20);
+            
+        case 'uparrow'                          % arm move up
+            brick.MoveMotor('A', 20);   
+            pause(0.2);                   
+            brick.MoveMotor('A', 0);    
+            
+        case 'downarrow'                        % arm move down
+            brick.MoveMotor('A', -20);  
+            pause(0.2);                   
+            brick.MoveMotor('A', 0);    
+            
+        case 0                                  % handles when no key is pressed
+            brick.MoveMotor('BC', 0);   
+            
+        case 'q'                                % quit and terminate remote control 
+            brick.MoveMotor('ABC', 0);  
             break;
     end
 end
-
 CloseKeyboard();
+
+
