@@ -1,4 +1,4 @@
-%  full remote control with arm control 
+% full remote control with arm control 
 % for # milestone 01
 
 global key;
@@ -7,39 +7,38 @@ InitKeyboard();
 while 1                             
     pause(0.1);
     switch key
-        case 'uparrow'                      %forward movement
+        case 'w'                                % forward movement
             brick.MoveMotor('BC', 50);  
             
-        case 'downarrow'                    % backward movement
+        case 's'                                % backward movement
             brick.MoveMotor('BC', -50);  
             
-        case 'leftarrow'                    % left side movement
+        case 'a'                                % left side movement
             brick.MoveMotor('B', 20);   
             brick.MoveMotor('C', 50);
             
-        case 'rightarrow'                   % right side movement
+        case 'd'                                % right side movement
             brick.MoveMotor('B', 50);   
             brick.MoveMotor('C', 20);
             
-        case 'w'                            % arm move up
+        case 'uparrow'                          % arm move up
             brick.MoveMotor('A', 20);   
-            pause(0.3);                   
+            pause(0.2);                   
             brick.MoveMotor('A', 0);    
             
-        case 's'                            % arm move down
+        case 'downarrow'                        % arm move down
             brick.MoveMotor('A', -20);  
-            pause(0.3);                   
+            pause(0.2);                   
             brick.MoveMotor('A', 0);    
             
-        case 0                              % handles when no key is pressed
+        case 0                                  % handles when no key is pressed
             brick.MoveMotor('BC', 0);   
             
-        case 'q'                            % quit and terminate remote control 
+        case 'q'                                % quit and terminate remote control 
             brick.MoveMotor('ABC', 0);  
             break;
     end
 end
 CloseKeyboard();
-
 
 
