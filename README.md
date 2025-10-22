@@ -7,10 +7,7 @@ Arizona State University
 
 ## Team Members
 
-- Rachit Srivastava
-- Megan Nguyen
-- Jacob Leon
-- Riya Yadav
+<h3>Rachit Srivastava, Megan Nguyen, Jacob Leon, Riya Yadav</h3>
 
 ---
 
@@ -26,6 +23,7 @@ Arizona State University
 - [About The Project](#about-the-project)
 - [Project Demo](#project-demo)
 - [Key Features](#key-features)
+- [Requirements](#requirements)
 
 ---
 
@@ -67,9 +65,7 @@ Watch our vehicle in action:
 
 ---
 
-## Prerequisites
-
-Before you begin, ensure you have the following:
+## Requirements
 
 - MATLAB R2025b
 - MATLAB Support Package for LEGO MINDSTORMS EV3 Hardware
