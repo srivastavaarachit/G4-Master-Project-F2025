@@ -37,7 +37,6 @@ Arizona State University
 Traditional transportation options often lack accessibility features or require human assistance, limiting independence for wheelchair users. SPYN provides a fully autonomous solution with:
 
 - Robotic arm mechanism for wheelchair pickup and placement
-- Rotating platform for optimal passenger orientation
 - Sensor-based safety systems for obstacle detection
 - Precise arm control for secure wheelchair handling
 
