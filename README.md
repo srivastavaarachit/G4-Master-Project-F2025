@@ -24,6 +24,7 @@ Arizona State University
 - [Project Demo](#project-demo)
 - [Key Features](#key-features)
 - [Requirements](#requirements)
+- [Project Milestones](#project-milestones)
 
 ---
 
@@ -73,6 +74,10 @@ Watch our vehicle in action:
 - Bluetooth adapter for EV3 connection
 - Windows 10/11 
 
-
 ---
 
+## Project Milestones
+
+| Milestone | Objective | Status |
+|-----------|-----------|--------|
+| **Milestone 01: Remote Control** | Establish EV3-MATLAB connection, implement keyboard-based vehicle control | Complete |
