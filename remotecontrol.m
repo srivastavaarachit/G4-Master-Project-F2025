@@ -8,17 +8,17 @@ while 1
     pause(0.1);
     switch key
         case 'w'                                % forward movement
-            brick.MoveMotor('BC', 50);  
+            brick.MoveMotor('BC', 100);  
             
         case 's'                                % backward movement
-            brick.MoveMotor('BC', -50);  
+            brick.MoveMotor('BC', -100);  
             
         case 'a'                                % left side movement
             brick.MoveMotor('B', 20);   
-            brick.MoveMotor('C', 50);
+            brick.MoveMotor('C', 100);
             
         case 'd'                                % right side movement
-            brick.MoveMotor('B', 50);   
+            brick.MoveMotor('B', 100);   
             brick.MoveMotor('C', 20);
             
         case 'uparrow'                          % arm move up
