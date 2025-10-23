@@ -22,12 +22,12 @@ while 1
             brick.MoveMotor('C', 20);
             
         case 'uparrow'                          % arm move up
-            brick.MoveMotor('A', 10);   
+            brick.MoveMotor('A', 20);   
             pause(0.2);                   
             brick.MoveMotor('A', 0);    
             
         case 'downarrow'                        % arm move down
-            brick.MoveMotor('A', -10);  
+            brick.MoveMotor('A', -20);  
             pause(0.2);                   
             brick.MoveMotor('A', 0);    
             
@@ -40,6 +40,7 @@ while 1
     end
 end
 CloseKeyboard();
+
 
 
 
