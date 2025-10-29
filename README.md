@@ -81,5 +81,6 @@ Watch our vehicle in action:
 | Milestone | Objective | Status |
 |-----------|-----------|--------|
 | **Milestone 01: Remote Control** | Establish EV3-MATLAB connection, implement keyboard-based vehicle control | Complete |<br>
-| **Milestone 02: Color Detection** | Robot stops for one second when it sees red, stops and beeps two times when it sees blue, and stops and beeps three times when it sees green. | In Process |
+| **Milestone 02: Color Detection** | Robot stops for one second when it sees red, stops and beeps two times when it sees blue, and stops and beeps three times when it sees green. | In Process |<br>
+| **Milestone 03: Maze Navigation** | Demonstrate that the robot vehicle can autonomously navigate the maze. | Not Complete |  
 
