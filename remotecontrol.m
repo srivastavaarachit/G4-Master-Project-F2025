@@ -41,6 +41,3 @@ while 1
 end
 CloseKeyboard();
 
-
-
-
