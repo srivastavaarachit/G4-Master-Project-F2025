@@ -23,12 +23,12 @@ while 1
             
         case 'uparrow'                          % arm move up
             brick.MoveMotor('A', 10);   
-            pause(0.2);                   
+            pause(0.5);                   
             brick.MoveMotor('A', 0);    
             
         case 'downarrow'                        % arm move down
             brick.MoveMotor('A', -10);  
-            pause(0.2);                   
+            pause(0.5);                   
             brick.MoveMotor('A', 0);    
             
         case 0                                  % handles when no key is pressed
