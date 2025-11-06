@@ -1,19 +1,12 @@
 % # milestone 02
 global key;
-
-brick.SetColorMode(1, 4);
-
+brick.SetColorMode(1, 4);  % Color sensor on port 1
 InitKeyboard();
-
 color_cooldown = 0;
-
 should_quit = false;
-
-brick.MoveMotor('BC', 50);
-
+brick.MoveMotor('AB', 50);  % Left wheel (A) and right wheel (B) forward
 fprintf("Robot started - driving forward autonomously\n");
 fprintf("Press 'q' to quit\n\n");
-
 while ~should_quit                             
     pause(0.1);
     
@@ -29,7 +22,7 @@ while ~should_quit
     end
     
     if color_cooldown == 0
-        color_rgb = brick.ColorRGB(1);
+        color_rgb = brick.ColorRGB(1);  % Read from color sensor on port 1
         red_val = color_rgb(1);
         green_val = color_rgb(2);
         blue_val = color_rgb(3);
@@ -44,7 +37,7 @@ while ~should_quit
                 pause(1);
                 fprintf("\tRed: %d, Green: %d, Blue: %d\n\n", red_val, green_val, blue_val);
                 
-                brick.MoveMotor('BC', 50);
+                brick.MoveMotor('AB', 50);  % Resume driving
                 color_cooldown = 20;
                 
             elseif (blue_val > red_val) && (blue_val > green_val) && (blue_val > 15)
@@ -55,7 +48,7 @@ while ~should_quit
                 brick.beep();
                 fprintf("\tRed: %d, Green: %d, Blue: %d\n\n", red_val, green_val, blue_val);
                 
-                brick.MoveMotor('BC', 50);
+                brick.MoveMotor('AB', 50);  % Resume driving
                 color_cooldown = 20;
                 
             elseif (green_val > red_val) && (green_val > blue_val) && (green_val > 15)
@@ -68,13 +61,12 @@ while ~should_quit
                 brick.beep();
                 fprintf("\tRed: %d, Green: %d, Blue: %d\n\n", red_val, green_val, blue_val);
                 
-                brick.MoveMotor('BC', 50);
+                brick.MoveMotor('AB', 50);  % Resume driving
                 color_cooldown = 20;
             end
         end
     end
     
 end
-
 CloseKeyboard();
 fprintf("Program ended successfully\n");
