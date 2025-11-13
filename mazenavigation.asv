@@ -1,0 +1,113 @@
+% # Milestone 03 - Autonomous Maze Navigation
+% Left wall following with collision detection
+global key;
+InitKeyboard();
+
+should_quit = false;
+target_distance = 25;  % Target distance from left wall in cm
+base_speed = 50;       % Base speed for both motors
+turn_gain = 2;         % Proportional gain for smooth turns
+
+fprintf("=== Autonomous Maze Navigation Started ===\n");
+fprintf("Target wall distance: %d cm\n", target_distance);
+fprintf("Press 'q' to quit\n\n");
+
+% Start moving forward
+brick.MoveMotor('AB', base_speed);
+
+while ~should_quit
+    pause(0.05);  % Small delay for sensor reading
+    
+    % Check for quit command
+    if key == 'q'
+        fprintf("\n=== Quitting program ===\n");
+        brick.StopAllMotors('Brake');
+        should_quit = true;
+        break;
+    end
+    
+    % Check touch sensor for front collision
+    touch_pressed = brick.TouchPressed(4);
+    
+    if touch_pressed
+        fprintf("COLLISION DETECTED! Backing up and turning right...\n");
+        
+        % Stop motors
+        brick.StopAllMotors('Brake');
+        pause(0.3);
+        
+        % Back up
+        brick.MoveMotor('AB', -40);
+        pause(1);
+        brick.StopAllMotors('Brake');
+        pause(0.2);
+        
+        % Turn right (90 degrees)
+        brick.MoveMotor('A', 50);   % Left wheel forward
+        brick.MoveMotor('B', -50);  % Right wheel backward
+        pause(1.2);  % Adjust timing for 90-degree turn
+        brick.StopAllMotors('Brake');
+        pause(0.2);
+        
+        % Resume forward movement
+        brick.MoveMotor('AB', base_speed);
+        fprintf("Resumed forward movement\n\n");
+        continue;
+    end
+    
+    % Read ultrasonic sensor distance (left wall)
+    distance = brick.UltrasonicDist(2);
+    
+    % Handle cases where sensor returns invalid readings
+    if distance > 200 || distance < 0
+        % No wall detected on left - turn left gently to find wall
+        fprintf("No left wall detected, searching...\n");
+        left_speed = base_speed - 20;
+        right_speed = base_speed + 20;
+        
+    else
+        % Calculate error from target distance
+        error = distance - target_distance;
+        
+        % Proportional control for smooth wall following
+        adjustment = error * turn_gain;
+        
+        % Limit adjustment to prevent excessive turning
+        if adjustment > 30
+            adjustment = 30;
+        elseif adjustment < -30
+            adjustment = -30;
+        end
+        
+        % Calculate motor speeds for smooth turning
+        left_speed = base_speed - adjustment;
+        right_speed = base_speed + adjustment;
+        
+        % Ensure motor speeds stay within valid range
+        if left_speed > 100
+            left_speed = 100;
+        elseif left_speed < -100
+            left_speed = -100;
+        end
+        
+        if right_speed > 100
+            right_speed = 100;
+        elseif right_speed < -100
+            right_speed = -100;
+        end
+        
+        % Print status every few cycles
+        if mod(round(distance), 5) == 0
+            fprintf("Distance: %.1f cm | Left: %d | Right: %d\n", ...
+                    distance, round(left_speed), round(right_speed));
+        end
+    end
+    
+    % Apply motor speeds for smooth wall following
+    brick.MoveMotor('A', left_speed);
+    brick.MoveMotor('B', right_speed);
+    
+end
+
+CloseKeyboard();
+fprintf("=== Maze navigation completed successfully ===\n");
