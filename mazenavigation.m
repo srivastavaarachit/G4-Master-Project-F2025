@@ -1,144 +1,148 @@
-% # Milestone 03 - Autonomous Maze Navigation (WORKING VERSION)
-% Left wall following with collision detection
+% WALL FOLLOWING - VERY SLOW (30-40 SPEED)
 global key;
 InitKeyboard();
-
-fprintf("=== Initializing Autonomous Navigation ===\n");
-fprintf("Target wall distance: 25 cm\n");
+fprintf("=== Navigation Starting NOW! ===\n");
 fprintf("Press 'q' to quit\n\n");
-
-% Test sensors
-fprintf("Testing sensors...\n");
-test_dist = brick.UltrasonicDist(2);
-fprintf("Ultrasonic sensor: %.2f cm\n", test_dist);
-test_touch = brick.TouchPressed(4);
-fprintf("Touch sensor: %d\n\n", test_touch);
-
-fprintf("Starting in 3 seconds...\n");
-pause(1);
-fprintf("3...\n");
-pause(1);
-fprintf("2...\n");
-pause(1);
-fprintf("1...\n");
-pause(1);
-fprintf("GO!\n\n");
-
+brick.SetColorMode(1, 2);
 should_quit = false;
-target_distance = 25;  % Target distance from left wall in cm
-base_speed = 50;       % Base speed for both motors
-turn_gain = 2;         % How aggressively to correct steering
-
+target_distance = 7;       % 2-3 inches
+DANGER_DISTANCE = 15;      % Safety threshold
+color_cooldown = 0;
 loop_count = 0;
 
+% MOTOR SPEEDS - MUCH SLOWER!
+LEFT_BASE  = 38;           % Reduced from 75
+RIGHT_BASE = 36;           % Reduced from 72
+WALL_GAIN  = 0.20;         % Reduced gain for slower speeds
+
+fprintf("GO! Slow mode (30-40 speed)\n\n");
+
 while ~should_quit
-    pause(0.1);
+    pause(0.08);
     loop_count = loop_count + 1;
     
-    % Check for quit
     if key == 'q'
-        fprintf("\n=== Quitting program ===\n");
+        fprintf("\n=== Quitting ===\n");
         brick.StopAllMotors('Brake');
-        should_quit = true;
         break;
     end
     
-    % Read sensors
+    % === READ SENSORS ===
     touch_pressed = brick.TouchPressed(4);
     distance = brick.UltrasonicDist(2);
+    color = brick.ColorCode(1);
     
-    % Handle invalid distance readings
+    % Handle bad ultrasonic readings
     if isnan(distance) || distance <= 0
-        distance = 255;  % Treat as "no wall detected"
+        distance = target_distance;
     end
     
-    % COLLISION HANDLING
+    % Show distance every 25 loops
+    if mod(loop_count, 25) == 0
+        fprintf("Distance: %.1f cm", distance);
+        if distance < DANGER_DISTANCE
+            fprintf(" [TOO CLOSE - AVOIDING!]");
+        end
+        fprintf("\n");
+    end
+    
+    if color_cooldown > 0
+        color_cooldown = color_cooldown - 1;
+    end
+    
+    % === COLLISION - 90° TURN ===
     if touch_pressed == 1
-        fprintf("\n>>> COLLISION DETECTED! <<<\n");
-        fprintf("Distance was: %.1f cm\n", distance);
-        
-        % Stop
+        fprintf("\n>>> COLLISION! <<<\n");
         brick.StopAllMotors('Brake');
         pause(0.5);
         
-        % Back up
-        fprintf("Backing up...\n");
-        brick.MoveMotor('A', -45);
-        brick.MoveMotor('B', -45);
-        pause(1.2);
+        % Back up (slow)
+        brick.MoveMotor('A', -30);
+        brick.MoveMotor('B', -30);
+        pause(1.5);
+        brick.StopAllMotors('Brake');
+        pause(0.2);
         
-        % Stop
+        % 90-degree LEFT turn (slow)
+        brick.MoveMotor('A', 35);
+        brick.MoveMotor('B', -35);
+        pause(0.50);
         brick.StopAllMotors('Brake');
         pause(0.3);
         
-        % Turn right 90 degrees
-        fprintf("Turning right 90 degrees...\n");
-        brick.MoveMotor('A', 55);   % Left wheel forward
-        brick.MoveMotor('B', -55);  % Right wheel backward
-        pause(1.3);  % Adjust this timing for exact 90 degrees
-        
-        % Stop
-        brick.StopAllMotors('Brake');
-        pause(0.3);
-        
-        fprintf("Resuming navigation...\n\n");
-        loop_count = 0;  % Reset loop counter
+        color_cooldown = 15;
         continue;
     end
     
-    % WALL FOLLOWING LOGIC
-    if distance > 200
-        % No left wall detected - turn left to search for wall
-        left_speed = 30;
-        right_speed = 60;
-        
-        if mod(loop_count, 10) == 0
-            fprintf("Searching for left wall (dist: %.1f cm)\n", distance);
-        end
-        
+    % === COLOR - RED ===
+    if color_cooldown == 0 && color == 5
+        fprintf("\n>>> RED DETECTED <<<\n");
+        brick.StopAllMotors('Brake');
+        brick.beep();
+        pause(0.5);
+        fprintf("Resuming\n\n");
+        color_cooldown = 20;
+        continue;
+    end
+    
+    % === COLOR - BLUE ===
+    if color_cooldown == 0 && color == 2
+        fprintf("\n>>> BLUE DETECTED <<<\n");
+        brick.StopAllMotors('Brake');
+        brick.beep();
+        pause(0.3);
+        brick.beep();
+        pause(0.3);
+        brick.beep();
+        pause(0.5);
+        fprintf("Resuming\n\n");
+        color_cooldown = 20;
+        continue;
+    end
+    
+    % === WALL FOLLOWING WITH COLLISION AVOIDANCE ===
+    
+    % DANGER ZONE: Too close to wall (<15cm) - STEER RIGHT!
+    if distance < DANGER_DISTANCE && distance > 0
+        % AGGRESSIVE right turn (slow speeds)
+        left_speed = 45;      % Left motor FASTER
+        right_speed = 25;     % Right motor SLOWER → turns RIGHT
+        fprintf("⚠️ DANGER: %.1f cm - Steering RIGHT!\n", distance);
     else
-        % Calculate error from target distance
+        % NORMAL PROPORTIONAL CONTROL
         error = distance - target_distance;
         
-        % Proportional control for smooth correction
-        adjustment = error * turn_gain;
-        
-        % Limit adjustment to prevent extreme turns
-        if adjustment > 30
-            adjustment = 30;
-        elseif adjustment < -30
-            adjustment = -30;
+        % Clamp error
+        if error > 15
+            error = 15;
+        elseif error < -15
+            error = -15;
         end
         
-        % Calculate motor speeds
-        left_speed = base_speed - adjustment;
-        right_speed = base_speed + adjustment;
+        adjustment = error * WALL_GAIN;
         
-        % Keep speeds within valid range [15, 85]
-        if left_speed > 85
-            left_speed = 85;
-        elseif left_speed < 15
-            left_speed = 15;
+        % Too far → turn LEFT, Too close → turn RIGHT
+        left_speed  = LEFT_BASE  - adjustment;
+        right_speed = RIGHT_BASE + adjustment;
+        
+        % Speed limits (SLOW RANGE)
+        if left_speed > 45
+            left_speed = 45;
+        elseif left_speed < 28
+            left_speed = 28;
         end
         
-        if right_speed > 85
-            right_speed = 85;
-        elseif right_speed < 15
-            right_speed = 15;
-        end
-        
-        % Print status every 10 loops (reduce console spam)
-        if mod(loop_count, 10) == 0
-            fprintf("Dist: %.1f cm | L: %d | R: %d | Err: %.1f\n", ...
-                    distance, round(left_speed), round(right_speed), error);
+        if right_speed > 45
+            right_speed = 45;
+        elseif right_speed < 28
+            right_speed = 28;
         end
     end
     
-    % Apply motor commands
+    % DRIVE
     brick.MoveMotor('A', left_speed);
     brick.MoveMotor('B', right_speed);
     
 end
-
 CloseKeyboard();
-fprintf("\n=== Navigation Complete ===\n");
+fprintf("\n=== Done ===\n");
