@@ -1,12 +1,23 @@
-% QUICK ULTRASONIC TEST - Port 2
-fprintf("=== Testing Ultrasonic Sensor on Port 2 ===\n");
-fprintf("Move your hand closer/farther from the sensor\n");
-fprintf("Press Ctrl+C to stop\n\n");
+global key;
+InitKeyboard();
 
-for i = 1:50
-    distance = brick.UltrasonicDist(2);
-    fprintf("Reading %d: %.1f cm\n", i, distance);
-    pause(0.2);
+fprintf("=== ULTRASONIC SENSOR TEST (PORT 3) ===\n");
+fprintf("Press 'q' to quit.\n");
+fprintf("Move your hand in front of Port 3 sensor.\n\n");
+
+while 1
+    pause(0.1); % Don't freeze Matlab
+    
+    if key == 'q'
+        break;
+    end
+    
+    % CHANGED: Now reading from Port 3
+    distance = brick.UltrasonicDist(3);
+    
+    % Print the value
+    fprintf("Distance: %.1f cm\n", distance);
 end
 
-fprintf("\nTest complete!\n");
+CloseKeyboard();
+fprintf("Done.\n");
