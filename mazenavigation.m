@@ -8,13 +8,13 @@ fprintf("Press 'q' to quit\n");
 brick.SetColorMode(1, 2);
 should_quit = false;
 
+% --- CONFIGURATION ---
+TARGET_CM = 15;    % The "Safe" distance
+DANGER_CM = 8;     % Absolute limit (Panic line)
 
-TARGET_CM = 15;    
-DANGER_CM = 8;     
-
-
-DRIVE_SPEED = 35;  
-TURN_SUB    = 10;  
+% --- SPEEDS (Slow & Smooth) ---
+DRIVE_SPEED = 35;  % Normal forward speed
+TURN_SUB    = 10;  % How much to slow the inner wheel when turning Right
 
 while ~should_quit
     pause(0.1); 
@@ -24,7 +24,7 @@ while ~should_quit
         break;
     end
 
-    % SENSORS (PORT 3) 
+    % --- SENSORS (PORT 3) ---
     dist = brick.UltrasonicDist(3);
     touch = brick.TouchPressed(4);
 
@@ -33,7 +33,7 @@ while ~should_quit
         dist = TARGET_CM;
     end
 
-    % COLLISION RECOVERY (Touch Sensor) 
+    % --- COLLISION RECOVERY (Touch Sensor) ---
     if touch == 1
         fprintf("Bump! Stopping...\n");
         brick.StopAllMotors('Brake');
@@ -49,28 +49,30 @@ while ~should_quit
         fprintf("Turning Right (90 deg)...\n");
         brick.MoveMotor('A', 35);       
         brick.MoveMotor('B', -35);
-        pause(0.8);                      
+        pause(0.8);                      % Adjust for 90 degrees
         brick.StopAllMotors('Brake');
         pause(0.5);
         continue;
     end
 
-    % STEERING LOGIC
+    % --- STEERING LOGIC ---
     
     % CASE 1: DANGER (< 8cm) -> Pivot Right
-    % 
+    % We are too close to the wall, we must turn away immediately.
     if dist < DANGER_CM
         fprintf("Danger (%.1f) -> Pivot Right\n", dist);
         brick.MoveMotor('A', 35);  
         brick.MoveMotor('B', -10); % Reverse inner wheel to pivot out
         
     % CASE 2: CLOSE (< 15cm) -> Gentle Right Turn
+    % We are entering the buffer zone, curve away gently.
     elseif dist < TARGET_CM
         fprintf("Too Close (%.1f) -> Curve Right\n", dist);
         brick.MoveMotor('A', DRIVE_SPEED);
         brick.MoveMotor('B', DRIVE_SPEED - TURN_SUB); 
 
     % CASE 3: FAR or PERFECT (> 15cm) -> GO STRAIGHT
+    % YOU ASKED FOR THIS: No Left adjustments.
     else
         fprintf("Clear (%.1f) -> Straight\n", dist);
         brick.MoveMotor('AB', DRIVE_SPEED);
