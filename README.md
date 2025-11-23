@@ -57,7 +57,12 @@ Watch our vehicle in action:
 
 [![Color Detection Demo](https://img.youtube.com/vi/4Ninnfr8OI0/0.jpg)](https://www.youtube.com/shorts/4Ninnfr8OI0)
 
-[Click here to watch color detection demo](https://www.youtube.com/shorts/4Ninnfr8OI0)
+[Click here to watch color detection demo](https://www.youtube.com/shorts/4Ninnfr8OI0)<br>
+
+[![Maze Navigation Demo](https://img.youtube.com/vi/4xxUE-q8rRg/0.jpg)](https://youtube.com/shorts/4xxUE-q8rRg?si=SoQ4o3q_nNNjvBbw)
+
+[Click here to watch the maze navigation demo](https://youtube.com/shorts/4xxUE-q8rRg?si=SoQ4o3q_nNNjvBbw)<br>
+
 
 ---
 
@@ -86,5 +91,5 @@ Watch our vehicle in action:
 |-----------|-----------|--------|
 | **Milestone 01: Remote Control** | Establish EV3-MATLAB connection, implement keyboard-based vehicle control | Completed |<br>
 | **Milestone 02: Color Detection** | Robot stops for one second when it sees red, stops and beeps two times when it sees blue, and stops and beeps three times when it sees green. | Completed |<br>
-| **Milestone 03: Maze Navigation** | Demonstrate that the robot vehicle can autonomously navigate the maze. | In Process |  
+| **Milestone 03: Maze Navigation** | Demonstrate that the robot vehicle can autonomously navigate the maze. | Completed |  
 
