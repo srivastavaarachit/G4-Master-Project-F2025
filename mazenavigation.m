@@ -14,7 +14,7 @@ DANGER_CM = 8;     % Absolute limit (Panic line)
 
 % --- SPEEDS (Slow & Smooth) ---
 DRIVE_SPEED = 35;  % Normal forward speed
-TURN_SUB    = 10;  % How much to slow the inner wheel when turning Right
+TURN_SUB    = 10;  
 
 while ~should_quit
     pause(0.1); 
@@ -65,14 +65,12 @@ while ~should_quit
         brick.MoveMotor('B', -10); % Reverse inner wheel to pivot out
         
     % CASE 2: CLOSE (< 15cm) -> Gentle Right Turn
-    % We are entering the buffer zone, curve away gently.
     elseif dist < TARGET_CM
         fprintf("Too Close (%.1f) -> Curve Right\n", dist);
         brick.MoveMotor('A', DRIVE_SPEED);
         brick.MoveMotor('B', DRIVE_SPEED - TURN_SUB); 
 
     % CASE 3: FAR or PERFECT (> 15cm) -> GO STRAIGHT
-    % YOU ASKED FOR THIS: No Left adjustments.
     else
         fprintf("Clear (%.1f) -> Straight\n", dist);
         brick.MoveMotor('AB', DRIVE_SPEED);
