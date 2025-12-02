@@ -1,9 +1,9 @@
 global key;
 InitKeyboard();
-
+fprintf("=== REVERSE WALL + MANUAL OVERRIDE ===\n");
 fprintf("1. Autonomous: Maintains 20-35cm from Right Wall\n");
 fprintf("2. Manual: Press 'w','a','s','d' to nudge robot\n");
-fprintf("(W=Fwd, S=Back, A=Left, D=Right)\n");
+fprintf("   (W=Fwd, S=Back, A=Left, D=Right)\n");
 fprintf("3. RED: Stop for 1 second\n");
 fprintf("4. BLUE/GREEN: Full keyboard control (Arrow keys for arm)\n");
 fprintf("Press 'q' to quit\n");
@@ -16,7 +16,8 @@ MIN_DIST = 20;
 MAX_DIST = 35;
 DANGER_CM = 12;
 
-DRIVE_SPEED = 45;  
+DRIVE_SPEED = 45; 
+
 TURN_SUB    = 6;   
 
 MANUAL_SPEED = 50; 
@@ -27,15 +28,13 @@ while ~should_quit
     color = brick.ColorCode(1);
     
     if color == 5 && ~red_detected
-        fprintf("RED DETECTED - STOPPING FOR 1 SECOND\n");
         brick.StopAllMotors('Brake');
         pause(1.0);
-        fprintf("Resuming movement...\n");
         red_detected = true;
         continue;
     end
     
-    if color ~= 5
+    if color ~= 5 && red_detected
         red_detected = false;
     end
     
@@ -124,26 +123,14 @@ while ~should_quit
         pause(0.2);
         
         brick.MoveMotor('AB', 30);      
-        pause(1.0);
+        pause(1.5);
         brick.StopAllMotors('Brake');
         pause(0.3);
+
+        brick.MoveMotor('A', 40);
+        brick.MoveMotor('B', -40);
+        pause(0.8);
         
-        check_dist = brick.UltrasonicDist(3);
-        if isnan(check_dist) || check_dist > 200
-             check_dist = 100; 
-        end
-        
-        if check_dist < 35
-            fprintf("Wall on Right -> Turn LEFT\n");
-            brick.MoveMotor('A', 25);       
-            brick.MoveMotor('B', -45);
-            pause(0.6); 
-        else
-            fprintf("Open Space -> Turn RIGHT\n");
-            brick.MoveMotor('A', -45);       
-            brick.MoveMotor('B', 25);
-            pause(0.6); 
-        end
         
         brick.StopAllMotors('Brake');
         pause(0.3);
@@ -152,10 +139,27 @@ while ~should_quit
     
     dist = brick.UltrasonicDist(3);
     if isnan(dist) || dist > 200
-        dist = MAX_DIST; 
+        dist = 100; 
     end
     
-    if dist < 35
+    if dist > 50
+        brick.MoveMotor('AB', -DRIVE_SPEED);
+        pause(1.0);
+        
+        brick.MoveMotor('A', -40);
+        brick.MoveMotor('B', 40);
+        pause(0.5);
+        
+        brick.MoveMotor('AB', -DRIVE_SPEED);
+        pause(1.2);
+
+
+        brick.StopAllMotors('Brake');
+        pause(0.3);
+
+
+        
+    elseif dist < 35
         brick.MoveMotor('A', -(DRIVE_SPEED - 2)); 
         brick.MoveMotor('B', -DRIVE_SPEED);
         
@@ -165,3 +169,13 @@ while ~should_quit
 end
 
 CloseKeyboard();
+
+
+
+
+
+
+
+
+
+
