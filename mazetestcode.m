@@ -1,6 +1,6 @@
 global key;
 InitKeyboard();
-fprintf("=== REVERSE WALL + MANUAL OVERRIDE ===\n");
+
 fprintf("1. Autonomous: Maintains 20-35cm from Right Wall\n");
 fprintf("2. Manual: Press 'w','a','s','d' to nudge robot\n");
 fprintf("   (W=Fwd, S=Back, A=Left, D=Right)\n");
