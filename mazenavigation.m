@@ -1,79 +1,204 @@
 global key;
 InitKeyboard();
-fprintf("=== WALL AVOIDER (No Left Turns) ===\n");
-fprintf("1. If < 15cm: Turn Right\n");
-fprintf("2. If > 15cm: Drive Straight\n");
+fprintf("=== REVERSE WALL + MANUAL OVERRIDE ===\n");
+fprintf("1. Autonomous: Maintains 20-35cm from Right Wall\n");
+fprintf("2. Manual: Press 'w','a','s','d' to nudge robot\n");
+fprintf("   (W=Fwd, S=Back, A=Left, D=Right)\n");
+fprintf("3. RED: Stop for 1 second\n");
+fprintf("4. BLUE/GREEN: Full keyboard control (Arrow keys for arm)\n");
 fprintf("Press 'q' to quit\n");
 
 brick.SetColorMode(1, 2);
 should_quit = false;
+red_detected = false;  % Flag to track if red was already detected
 
 % --- CONFIGURATION ---
-TARGET_CM = 15;    % The "Safe" distance
-DANGER_CM = 8;     % Absolute limit (Panic line)
+MIN_DIST = 20;     % Min distance
+MAX_DIST = 35;     % Max distance
+DANGER_CM = 12;    % Panic distance
 
-% --- SPEEDS (Slow & Smooth) ---
-DRIVE_SPEED = 35;  % Normal forward speed
-TURN_SUB    = 10;  
+% --- SPEEDS (Applied as NEGATIVE) ---
+DRIVE_SPEED = 45;  
+TURN_SUB    = 6;   
+
+% --- MANUAL SPEED ---
+MANUAL_SPEED = 50; 
 
 while ~should_quit
-    pause(0.1); 
+    pause(0.01); 
     
-    if key == 'q'
+    % === 1. CHECK COLOR SENSOR ===
+    color = brick.ColorCode(1);
+    
+    % === RED DETECTED: STOP FOR 1 SECOND (ONLY ONCE) ===
+    if color == 5 && ~red_detected  % Red color code and not already detected
+        fprintf("RED DETECTED - STOPPING FOR 1 SECOND\n");
         brick.StopAllMotors('Brake');
-        break;
+        pause(1.0);  % Stop for exactly 1 second
+        fprintf("Resuming movement...\n");
+        red_detected = true;  % Mark red as detected
+        continue;  % Resume autonomous mode
     end
-
-    % --- SENSORS (PORT 3) ---
-    dist = brick.UltrasonicDist(3);
-    touch = brick.TouchPressed(4);
-
-    % Safety: Filter bad data
-    if isnan(dist) || dist > 200
-        dist = TARGET_CM;
+    
+    % Reset red flag when no longer seeing red
+    if color ~= 5
+        red_detected = false;
     end
-
-    % --- COLLISION RECOVERY (Touch Sensor) ---
-    if touch == 1
-        fprintf("Bump! Stopping...\n");
-        brick.StopAllMotors('Brake');
-        pause(0.5);
+    
+    % === BLUE OR GREEN DETECTED: FULL KEYBOARD CONTROL ===
+    if color == 2 || color == 3  % Blue=2, Green=3
+        fprintf("COLOR DETECTED (Code: %d) - KEYBOARD CONTROL ACTIVE\n", color);
         
-        fprintf("Backing up...\n");
-        brick.MoveMotor('AB', -30);      
-        pause(1.5);
+        % Full remote control loop
+        switch key
+            case 'w'  % forward movement (swapped)
+                brick.MoveMotor('AB', -MANUAL_SPEED);
+                
+            case 's'  % backward movement (swapped)
+                brick.MoveMotor('AB', MANUAL_SPEED);
+                
+            case 'a'  % right turn (reversed)
+                brick.MoveMotor('A', -MANUAL_SPEED);
+                brick.MoveMotor('B', -(MANUAL_SPEED/2));
+                
+            case 'd'  % left turn (reversed)
+                brick.MoveMotor('A', -(MANUAL_SPEED/2));
+                brick.MoveMotor('B', -MANUAL_SPEED);
+                
+            case 'uparrow'  % arm move up
+                brick.MoveMotor('C', 10);
+                pause(0.5);
+                brick.MoveMotor('C', 0);
+                
+            case 'downarrow'  % arm move down
+                brick.MoveMotor('C', -10);
+                pause(0.5);
+                brick.MoveMotor('C', 0);
+                
+            case 0  % no key pressed
+                brick.MoveMotor('AB', 0);  % Stop wheel motors
+                
+            case 'q'  % quit
+                brick.MoveMotor('ABC', 0);
+                should_quit = true;
+                break;
+        end
         
+        continue;  % Stay in manual mode while color detected
+    end
+    
+    % === 2. CHECK KEYBOARD (MANUAL OVERRIDE IN AUTO MODE) ===
+    switch key
+        case 'q'
+            brick.StopAllMotors('Brake');
+            break;
+            
+        case 'w' % Forward (Negative)
+            fprintf("Manual: Forward\n");
+            brick.MoveMotor('AB', -MANUAL_SPEED);
+            pause(0.3);      % Run for short time
+            key = 0;         % Reset key to resume auto
+            continue;        % Skip sensors this loop
+            
+        case 's' % Backward (Positive)
+            fprintf("Manual: Backward\n");
+            brick.MoveMotor('AB', MANUAL_SPEED);
+            pause(0.3);
+            key = 0;
+            continue;
+            
+        case 'a' % Turn Left (Pivot)
+            fprintf("Manual: Left\n");
+            % Pivot Left: A Positive, B Negative
+            brick.MoveMotor('A', 30); 
+            brick.MoveMotor('B', -30);
+            pause(0.2);
+            key = 0;
+            continue;
+            
+        case 'd' % Turn Right (Pivot)
+            fprintf("Manual: Right\n");
+            % Pivot Right: A Negative, B Positive
+            brick.MoveMotor('A', -30); 
+            brick.MoveMotor('B', 30);
+            pause(0.2);
+            key = 0;
+            continue;
+    end
+    
+    % === 3. READ TOUCH SENSORS ===
+    touch_front_1 = brick.TouchPressed(4); 
+    touch_front_2 = brick.TouchPressed(2); 
+    
+    % --- COLLISION RECOVERY ---
+    if touch_front_1 == 1 || touch_front_2 == 1
+        fprintf("!!! BUMP DETECTED !!!\n");
         brick.StopAllMotors('Brake');
         pause(0.2);
         
-        fprintf("Turning Right (90 deg)...\n");
-        brick.MoveMotor('A', 35);       
-        brick.MoveMotor('B', -35);
-        pause(0.8);                      % Adjust for 90 degrees
+        % Back Up
+        brick.MoveMotor('AB', 30);      
+        pause(1.0);
+        brick.StopAllMotors('Brake');
+        pause(0.2);
+        
+        % CHECK SITUATION
+        check_dist = brick.UltrasonicDist(3);
+        if isnan(check_dist) || check_dist > 200
+             check_dist = 100; 
+        end
+        
+        % DECIDE TURN
+        if check_dist < 35
+            fprintf("Wall on Right -> Turn Shallow LEFT\n");
+            brick.MoveMotor('A', 25);       
+            brick.MoveMotor('B', -45);
+            pause(0.6); 
+        else
+            fprintf("Open Space -> Turn Shallow RIGHT\n");
+            brick.MoveMotor('A', -45);       
+            brick.MoveMotor('B', 25);
+            pause(0.6); 
+        end
+        
         brick.StopAllMotors('Brake');
         pause(0.5);
-        continue;
+        continue; 
     end
-
-    % --- STEERING LOGIC ---
     
-    % CASE 1: DANGER (< 8cm) -> Pivot Right
-    % We are too close to the wall, we must turn away immediately.
+    % === 4. AUTONOMOUS WALL FOLLOWING ===
+    dist = brick.UltrasonicDist(3);
+    if isnan(dist) || dist > 200
+        dist = MAX_DIST; 
+    end
+    
+    % CASE 1: PANIC (< 12cm) - AGGRESSIVE TURN
     if dist < DANGER_CM
-        fprintf("Danger (%.1f) -> Pivot Right\n", dist);
-        brick.MoveMotor('A', 35);  
-        brick.MoveMotor('B', -10); % Reverse inner wheel to pivot out
+        brick.MoveMotor('A', 20); 
+        brick.MoveMotor('B', -40); 
         
-    % CASE 2: CLOSE (< 15cm) -> Gentle Right Turn
-    elseif dist < TARGET_CM
-        fprintf("Too Close (%.1f) -> Curve Right\n", dist);
-        brick.MoveMotor('A', DRIVE_SPEED);
-        brick.MoveMotor('B', DRIVE_SPEED - TURN_SUB); 
-
-    % CASE 3: FAR or PERFECT (> 15cm) -> GO STRAIGHT
+    % CASE 2: TOO CLOSE (< 20cm) -> GENTLE STEER LEFT
+    elseif dist < MIN_DIST
+        % Gentle correction - smaller difference between wheels
+        brick.MoveMotor('A', -(DRIVE_SPEED - 3)); 
+        brick.MoveMotor('B', -DRIVE_SPEED);              
+        
+    % CASE 3: SLIGHTLY TOO FAR (35-50cm) -> GENTLE STEER RIGHT
+    elseif dist > MAX_DIST && dist <= 50
+        % Gentle correction - smaller difference between wheels
+        brick.MoveMotor('A', -DRIVE_SPEED);              
+        brick.MoveMotor('B', -(DRIVE_SPEED - 3)); 
+        
+    % CASE 4: WAY TOO FAR (> 50cm) -> MODERATE TURN RIGHT
+    elseif dist > 50
+        % Moderate turn for big gaps
+        brick.MoveMotor('A', -DRIVE_SPEED);              
+        brick.MoveMotor('B', -(DRIVE_SPEED - TURN_SUB)); 
+        
+    % CASE 5: PERFECT ZONE (20-35cm) -> STRAIGHT
     else
-        fprintf("Clear (%.1f) -> Straight\n", dist);
-        brick.MoveMotor('AB', DRIVE_SPEED);
+        brick.MoveMotor('AB', -DRIVE_SPEED);
     end
 end
+
 CloseKeyboard();
