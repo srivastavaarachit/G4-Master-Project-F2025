@@ -1,12 +1,7 @@
 global key;
 InitKeyboard();
 
-fprintf("1. Autonomous: Maintains 20-35cm from Right Wall\n");
-fprintf("2. Manual: Press 'w','a','s','d' to nudge robot\n");
-fprintf("   (W=Fwd, S=Back, A=Left, D=Right)\n");
-fprintf("3. RED: Stop for 1 second\n");
-fprintf("4. BLUE/GREEN: Full keyboard control (Arrow keys for arm)\n");
-fprintf("Press 'q' to quit\n");
+
 
 brick.SetColorMode(1, 2);
 should_quit = false;
