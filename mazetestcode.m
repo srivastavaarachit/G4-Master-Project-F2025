@@ -148,10 +148,10 @@ while ~should_quit
         
         brick.MoveMotor('A', -40);
         brick.MoveMotor('B', 40);
-        pause(0.5);
+        pause(0.8);     % if open space it will turn left 90 degrees approx
         
         brick.MoveMotor('AB', -DRIVE_SPEED);
-        pause(1.2);
+        pause(2.0);     % utlrasonic left cooldown
 
 
         brick.StopAllMotors('Brake');
@@ -159,7 +159,7 @@ while ~should_quit
 
 
         
-    elseif dist < 35
+    elseif dist < 25          % stay away from the wall!
         brick.MoveMotor('A', -(DRIVE_SPEED - 2)); 
         brick.MoveMotor('B', -DRIVE_SPEED);
         
